@@ -22,7 +22,7 @@ namespace MauiAppMinhasCompras.Helpers
             string sql = "UPDATE Produto SET Descricao=?, Quantidade=?, Preco=? WHERE Id=?";
 
             return _conn.QueryAsync<Produto>(
-                sql, p.Descricao, p.Quantidade, p.Preco, p.Id
+                sql, p.Descricao, p.Quantidade, p.Preco, p.Id, p.DataCadastro
             );
         }
         public Task<int> Delete(int id) 
@@ -38,6 +38,14 @@ namespace MauiAppMinhasCompras.Helpers
             string sql = "SELECT * FROM Produto WHERE descricao LIKE '%" + q + "%'";
 
             return _conn.QueryAsync<Produto>(sql);
+        }
+
+        public Task<List<Produto>> GetByDateRange(DateTime dtpInicio, DateTime dtpFim)
+        {
+            // filtra apenas pela data ignorando hora
+            return _conn.Table<Produto>()
+                .Where(p => p.DataCadastro >= dtpInicio && p.DataCadastro <= dtpFim)
+                .ToListAsync();
         }
 
     }

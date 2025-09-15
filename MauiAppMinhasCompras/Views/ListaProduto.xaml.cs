@@ -1,6 +1,5 @@
 using MauiAppMinhasCompras.Models;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace MauiAppMinhasCompras.Views;
 
@@ -45,9 +44,10 @@ public partial class ListaProduto : ContentPage
     {
         try
         {
+            lista.Clear();
             string q = e.NewTextValue;
 
-            lista.Clear();
+            lst_produtos.IsRefreshing = true;
 
             List<Produto> tmp = await App.Db.Search(q);
 
@@ -56,6 +56,10 @@ public partial class ListaProduto : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Ops", ex.Message, "Ok");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
         }
     }
 
@@ -103,6 +107,38 @@ public partial class ListaProduto : ContentPage
             {
                 BindingContext = p,
             });
+        }
+        catch (Exception ex)
+        {
+            DisplayAlert("Ops", ex.Message, "Ok");
+        }
+    }
+
+    private async void lst_produtos_Refreshing(object sender, EventArgs e)
+    {
+        try
+        {
+            lista.Clear();
+            List<Produto> tmp = await App.Db.GetAll();
+
+            tmp.ForEach(i => lista.Add(i));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "Ok");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
+        }
+    }
+
+    // Botão para abrir o relatório de produtos
+    private void ToolbarItem_Clicked_2(object sender, EventArgs e)
+    {
+        try
+        {
+            Navigation.PushAsync(new Views.RelatorioProduto());
         }
         catch (Exception ex)
         {
